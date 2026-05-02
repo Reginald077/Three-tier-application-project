@@ -99,3 +99,6 @@ The project includes:
 
 **Ogbemudia Otabor** — System Analyst transitioning into Cloud Engineering  
 [GitHub](https://github.com/Reginald077) | [LinkedIn](#)
+
+## 📝 Article
+Read the full write-up on Medium: https://medium.com/@reginaldotabor1/how-i-deployed-a-three-tier-application-on-aws-ec2-and-containerised-it-with-docker-76d0bec51ffd
