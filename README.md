@@ -1,38 +1,101 @@
-# Three Tier Application
+# Three-Tier Application Project
 
-This is an updated code from the original code: [AWS Three Tier Web Architecture Workshop](https://github.com/aws-samples/aws-three-tier-web-architecture-workshop/tree/main)
+A full-stack three-tier web application deployed on AWS EC2 and containerised using Docker and Docker Compose.
 
+## 🏗️ Architecture
 
-## Application code
-This contains source codes for the `app-tier` and `web-tier`
+The application follows the classic three-tier architecture:
 
-## Getting Started
-- On the web-tier instance, update `nginx.conf` with the internal loadbalancer dns.
-``` 
- sudo -su ec2-user
- cd ~
- sudo vi /etc/nginx/nginx.conf
- sudo systemctl restart nginx
- ```
+- **Web Tier** — React frontend served by NGINX
+- **App Tier** — Node.js backend REST API (port 4000)
+- **Database Tier** — MySQL database
 
-- On the app-tier instance, configure the database
+## 🛠️ Technologies Used
+
+- **Frontend:** React.js
+- **Backend:** Node.js, Express.js
+- **Database:** MySQL 8.0
+- **Web Server:** NGINX
+- **Containerisation:** Docker, Docker Compose
+- **Cloud:** AWS EC2 (Ubuntu 24.04)
+- **Process Manager:** PM2
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Docker and Docker Compose installed
+- AWS EC2 instance (t2.medium recommended)
+
+### Run with Docker Compose
+
+```bash
+# Clone the repository
+git clone https://github.com/Reginald077/Three-tier-application-project.git
+cd Three-tier-application-project
+
+# Start all containers
+docker compose up --build
 ```
- sudo -su ec2-user
- cd ~
- mysql -h CHANGE-TO-YOUR-RDS-ENDPOINT -u CHANGE-TO-USER-NAME -p # get the username and password from aws secret manager `db-cred`
- CREATE DATABASE webappdb;
- USE webappdb;
- CREATE TABLE IF NOT EXISTS transactions(id INT NOT NULL
-     -> AUTO_INCREMENT, amount DECIMAL(10,2), description
-     -> VARCHAR(100), PRIMARY KEY(id));
- INSERT INTO transactions (amount,description) VALUES ('400','groceries');
 
- # The output should look like this
- +----+--------+-------------+
- | id | amount | description |
- +----+--------+-------------+
- |  1 | 400.00 | groceries   |
- +----+--------+-------------+
- 1 row in set (0.00 sec)
- 
+Access the app at `http://localhost/#/db`
+
+### Run Manually (without Docker)
+
+1. **Database Setup**
+```bash
+sudo mysql -u root
+CREATE DATABASE webappdb;
+CREATE USER 'webappuser'@'localhost' IDENTIFIED BY 'StrongPassword123!';
+GRANT ALL PRIVILEGES ON webappdb.* TO 'webappuser'@'localhost';
+FLUSH PRIVILEGES;
+EXIT;
 ```
+
+2. **App Tier**
+```bash
+cd app-tier
+npm install
+npm install mysql2 dotenv
+# Create .env file with DB credentials
+npm start
+```
+
+3. **Web Tier**
+```bash
+cd web-tier
+npm install
+npm run build
+```
+
+4. **NGINX** — configure to serve the build folder and proxy /api/ to port 4000
+
+## 🐳 Docker Setup
+
+The project includes:
+- `app-tier/Dockerfile` — Node.js container
+- `web-tier/Dockerfile` — Multi-stage build: React build + NGINX
+- `docker-compose.yml` — Orchestrates all three containers
+
+## 📚 What I Learned
+
+- Deploying a multi-tier application on AWS EC2
+- Configuring NGINX as a reverse proxy
+- Debugging Node.js and MySQL connection issues
+- Containerising applications with Docker
+- Using Docker Compose to manage multi-container applications
+- Managing processes with PM2
+- Fixing file permission issues on Linux
+- Working with environment variables and dotenv
+
+## 🔧 Issues Solved Along the Way
+
+- Fixed MySQL authentication issues by migrating from `mysql` to `mysql2`
+- Resolved NGINX permission denied errors with `chmod`
+- Fixed dotenv loading order in `DbConfig.js` and `TransactionService.js`
+- Added swap memory to handle npm install on t2.micro
+- Configured Docker Compose `restart: on-failure` for app-tier startup timing
+
+## 👤 Author
+
+**Ogbemudia Otabor** — System Analyst transitioning into Cloud Engineering  
+[GitHub](https://github.com/Reginald077) | [LinkedIn](#)
